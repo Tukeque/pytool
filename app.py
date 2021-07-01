@@ -4,7 +4,6 @@ import pygame, render
 
 class App:
     name = ""
-    font_name = "JetBrainsMono-Medium.ttf"
 
     def start(self):
         """
@@ -38,7 +37,7 @@ class App:
     @final
     def alive_loop(self):
         while self.run:
-            self.run = render.update()
+            self.run = render.update(self.screen)
 
     @final
     def main(self):
@@ -55,7 +54,7 @@ class App:
         pygame.display.set_caption(self.name)
 
         #* self variables
-        self.font  = pygame.font.Font(self.font_name, 18)
+        #//self.font  = pygame.font.Font(self.font_name, 18)
         self.clock = pygame.time.Clock()
         self.run   = True
         self.fps   = 0
@@ -65,6 +64,7 @@ class App:
 
         #* start
         self.start()
+        render.resize(self.screen)
 
         start_new_thread(self.render_loop)
         self.alive_loop()
