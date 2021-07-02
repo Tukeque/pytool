@@ -20,4 +20,4 @@ class Dummy(app.App):
         print("hopefully appended a texture")
 
 dummy = Dummy("Testing pytool")
-dummy.main()
+dummy.run()

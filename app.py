@@ -1,3 +1,7 @@
+"""
+Module for the class to inherit from when creating a pytool app
+"""
+
 from typing import final
 from _thread import start_new_thread
 import pygame, render
@@ -40,7 +44,7 @@ class App:
             self.run = render.update(self.screen)
 
     @final
-    def main(self):
+    def run(self):
         """
         Called to start running the application
         """

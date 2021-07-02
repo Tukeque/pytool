@@ -1,10 +1,15 @@
 """
-* Classes:
-- Texture
-- Sprites?
+Module for all rendering done in pytool
+"""
 
-- Triangle?
-- Model
+"""
+* Classes to implement:
+- Texture - Yes
+- Sprites - Yes (not a class of its own but its functionality is implemented)
+- Buttons - Yes
+
+- Triangle? - For 3d Update
+- Model     - For 3d Update
 
 - Shader (how???)
 """
@@ -40,6 +45,15 @@ def anchor_to_vector2(anchor: str, width: int, height: int) -> list[int]:
 def text_objects(text, font, color):
     text_surface = font.render(text, True, color)
     return text_surface, text_surface.get_rect()
+
+def get_unit(screen) -> int:
+    unit = 0
+    if screen.get_width() > screen.get_height(): # horizontal
+        unit = screen.get_width() // 10
+    else: # vertical
+        unit = screen.get_height() // 10
+
+    return unit
 
 background = rgb("ffffff")
 base_anchors = ["top left", "top right", "bottom left", "bottom right"]
@@ -90,34 +104,6 @@ class Button:
         screen.blit(text_surf, text_rect)
 
 class Texture:
-    def load(self, file_name: str):
-        """
-        Load the texture from a file
-        """
-
-        with Image.open(file_name) as image:
-            self.realw = image.width
-            self.realh = image.height
-
-            self.cache(file_name)
-
-    def cache(self, file_name: str):
-        """
-        Create a scaled version of the texture and store it
-        """
-
-        self.image = Image.open(file_name).resize((self.w, self.h))
-
-    def generate_anchor_presets(self, width: int, height: int):
-        x, y, w, h = self.x, self.y, self.w, self.h
-
-        first = [[x, y + h], [x + w, y + h], [x, y], [x + w, y]]
-        result = []
-
-        for i, anchor in enumerate(first): result.append(vector2_subtract(anchor_to_vector2(self.anchors[i], width, height), anchor))
-
-        self.anchor_presets = result
-
     def __init__(self, kind: str, x: int, y: int, w: int, h: int, z: int, file_name: str, anchors: list[str] = ["center", "center", "center", "center"], button: Button = None):
         """
         kind: "sprite" or "texture"
@@ -147,8 +133,48 @@ class Texture:
         self.file_name = file_name
         self.load(file_name) # import & cache
 
-sprites : list[Texture] = []
-canvas  : list[Texture] = []
+    def load(self, file_name: str):
+        """
+        Load the texture from a file
+        """
+
+        with Image.open(file_name) as image:
+            self.realw = image.width
+            self.realh = image.height
+
+            self.cache(file_name)
+
+    def cache(self, file_name: str):
+        """
+        Create a scaled version of the texture and store it
+        """
+
+        self.image = Image.open(file_name).resize((self.w, self.h))
+
+    def generate_anchor_presets(self, width: int, height: int):
+        x, y, w, h = self.x, self.y, self.w, self.h
+
+        first = [[x, y + h], [x + w, y + h], [x, y], [x + w, y]]
+        result = []
+
+        for i, anchor in enumerate(first): result.append(vector2_subtract(anchor_to_vector2(self.anchors[i], width, height), anchor))
+
+        self.anchor_presets = result
+
+    def draw(self, screen, unit=0):
+        if self.kind != "sprite":
+            surface = pygame.image.fromstring(self.image.tobytes(), self.image.size, self.image.mode).convert()
+            screen.blit(surface, (self.x, screen.get_height() - self.y - self.h))
+        else:
+            surface = pygame.image.fromstring(self.image.tobytes(), self.image.size, self.image.mode).convert()
+
+            screen.blit(surface, (
+                screen.get_width() // 2 + self.x * unit - self.w // 2,
+                screen.get_height() // 2 - self.y * unit - self.h // 2
+            ))
+
+sprites: list[Texture] = []
+canvas : list[Texture] = []
 
 def resize(screen):
     width, height = screen.get_width(), screen.get_height()
@@ -193,34 +219,21 @@ def button_check(screen, mouse, click, texture: Texture, unit = 1, half_width=0,
     texture.button.check(mouse, click, half_width + texture.x * unit, half_height + texture.y * unit, texture.w, texture.h)
     texture.button.draw(screen, half_width + texture.x * unit, half_height + texture.y * unit, texture.w, texture.h)
         
-def draw(screen): # TODO make functions in the classes to handle stuff in here easier
+def draw(screen):
     screen.fill(background)
 
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
     for texture in canvas:
-        surface = pygame.image.fromstring(texture.image.tobytes(), texture.image.size, texture.image.mode).convert()
-
-        screen.blit(surface, (texture.x, screen.get_height() - texture.y - texture.h))
-
+        texture.draw(screen)
         button_check(screen, mouse, click, texture)
 
-    unit = 0
-    if screen.get_width() > screen.get_height(): # horizontal
-        unit = screen.get_width() // 10
-    else: # vertical
-        unit = screen.get_height() // 10
+    unit = get_unit(screen)
         
     for sprite in sprites:
         # draw sprite
-        surface = pygame.image.fromstring(sprite.image.tobytes(), sprite.image.size, sprite.image.mode).convert()
-
-        screen.blit(surface, (
-                        screen.get_width() // 2 + sprite.x * unit - sprite.w // 2,
-                        screen.get_height() // 2 - sprite.y * unit - sprite.h // 2
-                    ))
-
+        sprite.draw(screen, unit)
         button_check(screen, mouse, click, sprite, unit, screen.get_width() // 2 - sprite.w // 2, screen.get_height() // 2 - sprite.h // 2)
 
     pygame.display.flip()
