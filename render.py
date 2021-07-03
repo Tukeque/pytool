@@ -225,13 +225,13 @@ def draw(screen):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
-    for texture in canvas:
+    for texture in canvas: # TODO z depth sorting
         texture.draw(screen)
         button_check(screen, mouse, click, texture)
 
     unit = get_unit(screen)
         
-    for sprite in sprites:
+    for sprite in sprites: # TODO z depth sorting
         # draw sprite
         sprite.draw(screen, unit)
         button_check(screen, mouse, click, sprite, unit, screen.get_width() // 2 - sprite.w // 2, screen.get_height() // 2 - sprite.h // 2)
