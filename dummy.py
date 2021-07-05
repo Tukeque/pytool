@@ -14,10 +14,10 @@ class Dummy(app.App):
         #//    render.Texture("canvas", self.screen.get_width() // 2 - 128, self.screen.get_height() // 2 - 128, 256, 256, 0, "assets/images/Monkat.png", ["center", "center", "bottom", "bottom"])
         #//)
         render.sprites.append(
-            render.Texture("sprite", 0, 0, 1, 1, 0, "assets/images/Monkat.png", button = render.Button("Push me!", (0, 0, 0), "center", 20, on_push = on_push))
+            render.Texture("sprite", 0, 0, 1, 1, 0, "assets/images/Monkat.png", button = render.Button("Push me!", (0, 0, 0), "center", 20, on_down = on_push))
         )
         render.texts.append(
-            render.Text("Hello, World!", (0, 0, 0), 20, self.screen.get_width() // 2, self.screen.get_height() // 2, 0, "bottom left")
+            render.Text("Hello, World!", (0, 0, 0), 20, self.screen.get_width() // 2, self.screen.get_height() // 2 + 100, 0, "bottom left")
         )
 
         print("hopefully appended a texture")

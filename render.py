@@ -80,7 +80,10 @@ class Text:
         screen.blit(text_surf, text_rect)
 
 class Button:
-    def on_push(self):
+    def on_down(self):
+        pass
+
+    def on_up(self):
         pass
 
     def on_hover(self):
@@ -89,19 +92,27 @@ class Button:
     def on_lift(self):
         pass
 
-    def __init__(self, text: str, text_color: tuple[int, int, int], text_alignment: str, text_size: int, on_push = None, on_hover = None, on_lift = None):
+    def while_on(self):
+        pass
+
+    def __init__(self, text: str, text_color: tuple[int, int, int], text_alignment: str, text_size: int, on_down = None, on_up = None, on_hover = None, on_lift = None, while_on = None):
         self.text = text
         self.text_color = text_color
         self.text_alignment = text_alignment
         self.text_size = text_size
 
         self.on = False
-        if on_push != None:
-            self.on_push = on_push
+        self.push = False
+        if on_down != None:
+            self.on_down = on_down
+        if on_up != None:
+            self.on_up = on_up
         if on_hover != None:
             self.on_hover = on_hover
         if on_lift != None:
             self.on_lift = on_lift
+        if while_on != None:
+            self.while_on = while_on
 
     def check(self, mouse, click, x: int, y: int, w: int, h: int):
         if (mouse[0] > x & mouse[0] < x + w) & (mouse[1] > y & mouse[1] < y + h): # self.on_hover()
@@ -110,7 +121,15 @@ class Button:
             self.on = True
 
             if click[0]: # self.on_push()
-                self.on_push()
+                if self.push == False:
+                    self.on_down()
+                self.push = True
+
+                self.while_on()
+            else:
+                if self.push == True:
+                    self.on_up()
+                self.push = False
 
         else: # self.on_lift()
             if self.on == True: # last frame was on, but not anymore
