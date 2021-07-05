@@ -7,7 +7,8 @@ from _thread import start_new_thread
 import pygame, render
 
 class App:
-    name = ""
+    name = "Application"
+    font = "assets/fonts/JetBrainsMono-Medium.ttf"
 
     def start(self):
         """
@@ -68,6 +69,7 @@ class App:
 
         #* start
         self.start()
+        render.font_file_name = self.font
         render.resize(self.screen)
 
         start_new_thread(self.render_loop)

@@ -59,6 +59,26 @@ background = rgb("ffffff")
 base_anchors = ["top left", "top right", "bottom left", "bottom right"]
 font_file_name = "assets/fonts/JetBrainsMono-Medium.ttf"
 
+class Text:
+    def __init__(self, text: str, text_color: tuple[int, int, int], text_size: int, x: int, y: int, z: int, text_alignment: str):
+        self.text = text
+        self.text_color = text_color
+        self.text_size = text_size
+
+        self.x, self.y = x, y
+        self.z = z
+        self.text_alignment = text_alignment
+
+    def draw(self, screen):
+        font = pygame.font.Font(font_file_name, self.text_size)
+        text_surf, text_rect = text_objects(self.text, font, self.text_color)
+
+        anchor_preset = anchor_to_vector2(self.text_alignment, text_rect.width, text_rect.height)
+        center = vector2_add((self.x, self.y), anchor_preset)
+
+        text_rect.center = (center[0], screen.get_height() - center[1])
+        screen.blit(text_surf, text_rect)
+
 class Button:
     def on_push(self):
         pass
@@ -173,6 +193,7 @@ class Texture:
                 screen.get_height() // 2 - self.y * unit - self.h // 2
             ))
 
+texts  : list[Text   ] = [] 
 sprites: list[Texture] = []
 canvas : list[Texture] = []
 
@@ -220,20 +241,30 @@ def button_check(screen, mouse, click, texture: Texture, unit = 1, half_width=0,
     texture.button.draw(screen, half_width + texture.x * unit, half_height + texture.y * unit, texture.w, texture.h)
         
 def draw(screen):
+    global sprites, canvas, texts
     screen.fill(background)
 
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
-    for texture in canvas: # TODO z depth sorting
-        texture.draw(screen)
-        button_check(screen, mouse, click, texture)
-
+    #* draw sprites first
     unit = get_unit(screen)
         
-    for sprite in sprites: # TODO z depth sorting
+    sprites = sorted(sprites, key=lambda texture: texture.z)
+    for sprite in sprites:
         # draw sprite
         sprite.draw(screen, unit)
         button_check(screen, mouse, click, sprite, unit, screen.get_width() // 2 - sprite.w // 2, screen.get_height() // 2 - sprite.h // 2)
+    
+    #* draw textures second
+    canvas = sorted(canvas, key=lambda texture: texture.z)
+    for texture in canvas:
+        texture.draw(screen)
+        button_check(screen, mouse, click, texture)
+
+    #* draw text third(last)
+    texts = sorted(texts, key=lambda text: text.z)
+    for text in texts:
+        text.draw(screen)
 
     pygame.display.flip()
