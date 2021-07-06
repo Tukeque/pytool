@@ -27,9 +27,12 @@ def vector2_subtract(a: list[int], b: list[int]) -> list[int]:
     return [a[0] - b[0],
             a[1] - b[1]]
 
-def vector2_add(a: list[int], b: list[int]) -> list[int]:
-    return [a[0] + b[0],
-            a[1] + b[1]]
+def vector2_add(a: list[int], b: list[int], c: list[int] = None) -> list[int]:
+    if c == None:
+        return [a[0] + b[0],
+                a[1] + b[1]]
+    else:
+        return vector2_add(vector2_add(a, b), c)
 
 def anchor_to_vector2(anchor: str, width: int, height: int) -> list[int]:
     if anchor == "top left":       return [0       , height   ]
@@ -60,13 +63,14 @@ base_anchors = ["top left", "top right", "bottom left", "bottom right"]
 font_file_name = "assets/fonts/JetBrainsMono-Medium.ttf"
 
 class Text:
-    def __init__(self, text: str, text_color: tuple[int, int, int], text_size: int, x: int, y: int, z: int, text_alignment: str):
+    def __init__(self, text: str, text_color: tuple[int, int, int], text_size: int, x: int, y: int, z: int, anchor: str, text_alignment: str):
         self.text = text
         self.text_color = text_color
         self.text_size = text_size
 
         self.x, self.y = x, y
         self.z = z
+        self.anchor = anchor
         self.text_alignment = text_alignment
 
     def draw(self, screen):
@@ -74,7 +78,7 @@ class Text:
         text_surf, text_rect = text_objects(self.text, font, self.text_color)
 
         anchor_preset = anchor_to_vector2(self.text_alignment, text_rect.width, text_rect.height)
-        center = vector2_add((self.x, self.y), anchor_preset)
+        center = vector2_add((self.x, self.y), anchor_preset, anchor_to_vector2(self.anchor, screen.get_width(), screen.get_height()))
 
         text_rect.center = (center[0], screen.get_height() - center[1])
         screen.blit(text_surf, text_rect)
