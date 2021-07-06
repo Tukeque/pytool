@@ -119,7 +119,7 @@ class Button:
             self.while_on = while_on
 
     def check(self, mouse, click, x: int, y: int, w: int, h: int):
-        if (mouse[0] > x & mouse[0] < x + w) & (mouse[1] > y & mouse[1] < y + h): # self.on_hover()
+        if (mouse[0] > x and mouse[0] < x + w) and (mouse[1] > y and mouse[1] < y + h): # self.on_hover()
             # mouse is on top of button/texture
             self.on_hover()
             self.on = True
@@ -174,7 +174,7 @@ class Texture:
         self.button = button
 
         self.file_name = file_name
-        self.load(file_name) # import & cache
+        self.load(file_name) # import and cache
 
     def load(self, file_name: str):
         """
