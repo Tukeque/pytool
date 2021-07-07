@@ -143,7 +143,7 @@ class Button:
     def draw(self, screen, x: int, y: int, w: int, h: int):
         font = pygame.font.Font(font_file_name, self.text_size)
         text_surf, text_rect = text_objects(self.text, font, self.text_color)
-        text_rect.center = (x + w // 2, y + h // 2)
+        text_rect.center = (x + w // 2, screen.get_height() - y - h // 2)
         screen.blit(text_surf, text_rect)
 
 class Texture:
@@ -245,6 +245,8 @@ def resize(screen):
         sprite.h = sprite.sh * unit
 
         sprite.cache(sprite.file_name)
+
+    draw(screen)
 
 def update(screen) -> bool:
     for event in pygame.event.get():
